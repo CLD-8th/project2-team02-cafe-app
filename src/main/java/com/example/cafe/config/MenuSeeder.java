@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * menus 표가 비어 있으면 기본 메뉴를 넣음 (가상 데이터). 한 개라도 있으면 아무것도 안 함.
- * Pod 여러 개가 동시에 넣으려 하면 이름 유일 제약으로 하나만 성공 → 나머지는 로그만 남기고 계속 뜸.
+ * 앱 여러 개가 동시에 넣으려 하면 이름 유일 제약으로 하나만 성공 → 나머지는 로그만 남기고 계속 뜸.
  */
 @Component
 public class MenuSeeder implements ApplicationRunner {

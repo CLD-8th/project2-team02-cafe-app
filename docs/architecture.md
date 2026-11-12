@@ -26,7 +26,7 @@ PNG 버전 (Notion · 발표 자료용) : [architecture.png](architecture.png)
 | | local (내 PC · 테스트) | prod (운영) |
 | --- | --- | --- |
 | DB | H2 메모리 · 끄면 사라짐 | MySQL — 연결 방식은 인프라 확정 후 |
-| 사진 | `./data/menu-images` · 앱이 `/local-images/**` 로 내려줌 | 외부 저장소 — 인프라 확정 후 |
+| 사진 | `./data/menu-images` · 앱이 `/local-images/**` 로 내려줌 | 디스크 `/app/data/menu-images` (지금) — 운영 저장소는 인프라 확정 후 |
 | JWT 키 · 직원 계정 | 설정 파일의 테스트 값 | 환경 변수 — [config.md](config.md) |
 | 필요한 것 | JDK 21 만 | 위 값들 |
 

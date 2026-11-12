@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
  * JWT 서명 · 검증 (HS256) 과 비밀번호 해시 (BCrypt).
  *
  * 서명 키는 환경 변수 JWT_SECRET 으로만 받음 — 이미지 · 저장소에 넣지 않음.
- * 모든 Pod 가 같은 키를 써야 어느 Pod 가 발급한 토큰이든 다른 Pod 가 검증할 수 있음.
+ * 앱이 여러 개 떠 있으면 모두 같은 키를 써야 서로 발급한 토큰을 검증할 수 있음.
  */
 @Configuration
 public class JwtConfig {

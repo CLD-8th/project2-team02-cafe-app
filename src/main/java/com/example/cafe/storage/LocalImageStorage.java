@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -15,11 +14,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * 디스크 저장소. prod 가 아닐 때(내 PC · 테스트). AWS 자격 증명 불필요.
+ * 디스크 저장소. 저장 폴더는 app.storage.local-path (local 은 ./data/menu-images).
  * 저장한 사진은 /local-images/** 로 앱이 직접 내려줌.
  */
 @Configuration
-@Profile("!prod")
 public class LocalImageStorage implements ImageStorage, WebMvcConfigurer {
 
     public static final String URL_PREFIX = "/local-images/";

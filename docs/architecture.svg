@@ -130,7 +130,7 @@
   <text x="838" y="528" class="h">사진 저장소</text>
   <text x="838" y="550" class="code">menus/{메뉴id}/{uuid}.png</text>
   <text x="838" y="572" class="s">로컬: ./data/menu-images 폴더</text>
-  <text x="838" y="592" class="s">운영: 외부 저장소 (연결 방식 미정)</text>
+  <text x="838" y="592" class="s">운영: 지금은 디스크 · 저장소는 미정</text>
 
   <!-- 앱 → 데이터 -->
   <path d="M750 490 L790 490 L790 300 L818 300" class="line" marker-end="url(#arrow)"/>

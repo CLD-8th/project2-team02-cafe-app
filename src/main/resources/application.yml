@@ -26,7 +26,7 @@ management:
   endpoints:
     web:
       exposure:
-        # 헬스 체크(ALB · Probe) · 빌드 버전 · Prometheus 지표
+        # 헬스 체크 · 빌드 버전 · Prometheus 지표
         include: health,info,prometheus
   endpoint:
     health:

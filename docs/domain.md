@@ -84,14 +84,14 @@ com.example.cafe
 ├── CafeApplication
 ├── api        컨트롤러 · dto · CurrentUsers(JWT → CurrentUser)
 ├── service    엔티티 · 리포지토리 · 업무 규칙 (Auth · Menu · Order · ImageValidator)
-├── storage    ImageStorage — local 은 디스크 · prod 는 외부 저장소
+├── storage    ImageStorage — 지금은 디스크 구현(LocalImageStorage) 하나
 ├── config     SecurityConfig · JwtConfig · MenuSeeder · StaffAccountInitializer
 └── common     ErrorResponse · GlobalExceptionHandler · 예외들
 ```
 
 ## 05. 배포 중 호환
 
-롤링 배포 동안 옛 버전과 새 버전이 같은 표를 함께 씀.
+새 버전으로 바꾸는 동안 옛 버전과 새 버전이 잠깐 함께 떠서 같은 표를 씀.
 
 - 열 추가는 nullable 로 먼저 → 다음 배포에서 사용. 열 삭제 · 이름 변경은 한 번에 하지 않음.
 - 상태 enum 에 값을 추가하면 옛 버전이 그 값을 읽을 때 실패 → "읽기 지원" 배포 다음에 "쓰기" 배포.

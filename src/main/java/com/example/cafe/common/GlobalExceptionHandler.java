@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
         return body(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "multipart 항목이 없음: " + e.getRequestPartName());
     }
 
-    /** 저장소(디스크 · S3) 입출력 실패. 경로 · 버킷 이름이 드러나지 않게 요약만 */
+    /** 사진 저장소 입출력 실패. 경로가 드러나지 않게 요약만 */
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ErrorResponse> handleIo(IOException e) {
         log.error("저장소 입출력 실패", e);

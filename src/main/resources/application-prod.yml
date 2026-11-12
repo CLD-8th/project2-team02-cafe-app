@@ -1,6 +1,6 @@
-# 컨테이너(EKS). 주문 · 회원 · 메뉴는 RDS MySQL, 메뉴 사진은 S3.
+# 운영. 주문 · 회원 · 메뉴는 MySQL, 메뉴 사진은 디스크 폴더.
 # 접속 정보 · 비밀은 전부 환경 변수로만 받음 — 이미지 · 저장소에 넣지 않음. 필수 값이 비어 있으면 기동 실패.
-# 실제 값을 어디서 주입할지(ConfigMap · Secret · External Secrets)는 인프라 · 매니페스트 구성이 정해지면 연결.
+# 값을 어디서 넣을지는 운영 환경(인프라) 구성이 정해지면 연결.
 spring:
   datasource:
     url: ${DB_URL}
@@ -15,15 +15,15 @@ spring:
 
 app:
   jwt:
-    # 32바이트 이상. 모든 Pod 가 같은 값이어야 함 (비밀)
+    # 32바이트 이상. 앱이 여러 개면 모두 같은 값 (비밀)
     secret: ${JWT_SECRET}
   staff:
     # 선택. 둘 다 있을 때만 기동 시 직원 계정 생성 (이미 있으면 건너뜀)
     username: ${STAFF_USERNAME:}
     password: ${STAFF_PASSWORD:}
-  s3:
-    bucket: ${APP_S3_BUCKET}
-    region: ${AWS_REGION:ap-northeast-2}
+  storage:
+    # 메뉴 사진 저장 폴더 (기본 /app/data/menu-images)
+    local-path: ${APP_IMAGE_PATH:/app/data/menu-images}
 
 logging:
   level:
