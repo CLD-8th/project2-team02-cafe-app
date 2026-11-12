@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.1.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.1.0'
+description = 'cafe'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    awsSdkVersion = '2.31.59'
+}
+
+dependencies {
+    // 웹 요청 처리 · 화면(static/)도 같은 앱이 내려줌
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    // 생존 확인(/actuator/health) · 빌드 정보(/actuator/info) · 지표(/actuator/prometheus)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    // 주문 표. local 은 H2(메모리), prod 는 RDS MySQL
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // 메뉴 사진. prod 는 S3 (local 은 디스크). 버전은 BOM 하나로 맞춤 — file-service 와 같은 버전
+    implementation platform("software.amazon.awssdk:bom:${awsSdkVersion}")
+    implementation 'software.amazon.awssdk:s3'
+
+    // 회원 · 로그인. 비밀번호는 BCrypt, 토큰은 JWT(HS256) — Spring Security 공식 모듈
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// /actuator/info 의 build 항목(version · time). 배포 후 "어느 버전이 떠 있나"를 여기서 확인함
+springBoot {
+    buildInfo()
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

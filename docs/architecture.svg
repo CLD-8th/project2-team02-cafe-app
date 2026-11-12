@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 760" width="1120" height="760" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b3621"/>
+    </marker>
+    <style>
+      .title { font-size: 22px; font-weight: 700; fill: #2b1d10; }
+      .sub { font-size: 13px; fill: #6b5a48; }
+      .h { font-size: 15px; font-weight: 700; fill: #2b1d10; }
+      .t { font-size: 12.5px; fill: #333; }
+      .tb { font-size: 12.5px; fill: #2b1d10; font-weight: 700; }
+      .s { font-size: 11.5px; fill: #555; }
+      .code { font-size: 11.5px; fill: #3a2a18; font-family: Consolas, Menlo, monospace; }
+      .lbl { font-size: 11.5px; fill: #4b3621; }
+      .box { fill: #fff; stroke: #4b3621; stroke-width: 1.5; }
+      .screen { fill: #fff; stroke: #c8a165; stroke-width: 1.2; }
+      .app { fill: #fbf6ef; stroke: #4b3621; stroke-width: 2; }
+      .layer { fill: #fff; stroke: #c8a165; stroke-width: 1.2; }
+      .data { fill: #f6f8fb; stroke: #6b7c93; stroke-width: 1.5; }
+      .table { fill: #fff; stroke: #9aa8bb; stroke-width: 1.1; }
+      .note { fill: #fffaf0; stroke: #d9c7a6; stroke-width: 1; }
+      .line { stroke: #4b3621; stroke-width: 1.6; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1120" height="760" fill="#ffffff"/>
+
+  <text x="30" y="36" class="title">cafe 앱 아키텍처</text>
+  <text x="30" y="58" class="sub">앱 하나(Spring Boot) 안에 화면과 API 가 함께 있음 · 운영 환경(인프라) 구성은 팀에서 상의 중이라 넣지 않음</text>
+
+  <!-- 브라우저 -->
+  <rect x="30" y="90" width="250" height="470" rx="10" class="box"/>
+  <text x="48" y="118" class="h">브라우저</text>
+  <text x="48" y="138" class="s">static/ — HTML · CSS · 바닐라 JS</text>
+
+  <rect x="46" y="154" width="218" height="86" rx="6" class="screen"/>
+  <text x="60" y="176" class="tb">로그인 화면</text>
+  <text x="60" y="196" class="s">• 로그인 · 회원가입(손님)</text>
+  <text x="60" y="214" class="s">• 받은 JWT 를 localStorage 에</text>
+  <text x="60" y="231" class="s">• 역할 보고 화면 전환</text>
+
+  <rect x="46" y="252" width="218" height="96" rx="6" class="screen"/>
+  <text x="60" y="274" class="tb">손님 화면</text>
+  <text x="60" y="294" class="s">• 메뉴 카드(사진 · 가격)</text>
+  <text x="60" y="312" class="s">• 수량 골라 주문</text>
+  <text x="60" y="330" class="s">• 내 주문 · 접수 상태면 취소</text>
+
+  <rect x="46" y="360" width="218" height="114" rx="6" class="screen"/>
+  <text x="60" y="382" class="tb">직원 화면</text>
+  <text x="60" y="402" class="s">• 전체 주문 · 상태별 필터</text>
+  <text x="60" y="420" class="s">• 제조 시작 · 완료 · 취소</text>
+  <text x="60" y="438" class="s">• 메뉴 추가 · 수정 · 판매 중지</text>
+  <text x="60" y="456" class="s">• 메뉴 사진 올리기</text>
+
+  <text x="48" y="502" class="s">모든 요청에 헤더</text>
+  <text x="48" y="520" class="code">Authorization: Bearer &lt;JWT&gt;</text>
+  <text x="48" y="542" class="s">5초마다 주문 목록 새로 고침</text>
+
+  <!-- 화살표 브라우저 → 앱 -->
+  <path d="M280 300 L338 300" class="line" marker-end="url(#arrow)"/>
+  <text x="292" y="290" class="lbl">HTTP</text>
+  <text x="292" y="318" class="lbl">JSON</text>
+
+  <!-- 앱 -->
+  <rect x="340" y="90" width="430" height="560" rx="10" class="app"/>
+  <text x="358" y="118" class="h">cafe 앱 (Spring Boot 4.1 · Java 21)</text>
+  <text x="358" y="138" class="s">이미지 하나 · 포트 8080 · 환경마다 다른 값은 환경 변수</text>
+
+  <rect x="360" y="154" width="390" height="70" rx="6" class="layer"/>
+  <text x="375" y="176" class="tb">① 보안 — Spring Security</text>
+  <text x="375" y="196" class="s">JWT(HS256) 검증 · 세션 없음 · 비밀번호는 BCrypt</text>
+  <text x="375" y="214" class="s">누구나: 화면 · 메뉴 보기 · 가입/로그인  |  직원만: 메뉴 관리</text>
+
+  <rect x="360" y="236" width="390" height="104" rx="6" class="layer"/>
+  <text x="375" y="258" class="tb">② api — 컨트롤러</text>
+  <text x="375" y="280" class="code">/api/auth    signup · login · me</text>
+  <text x="375" y="299" class="code">/api/menus   조회 · 추가 · 수정 · 판매 중지 · 사진</text>
+  <text x="375" y="318" class="code">/api/orders  생성 · 조회 · 상태 변경 · 목록</text>
+
+  <rect x="360" y="352" width="390" height="104" rx="6" class="layer"/>
+  <text x="375" y="374" class="tb">③ service — 업무 규칙</text>
+  <text x="375" y="396" class="s">AuthService   가입 · 로그인 → 토큰 발급</text>
+  <text x="375" y="415" class="s">MenuService   메뉴 관리 · 사진 교체</text>
+  <text x="375" y="434" class="s">OrderService  상태 전이 · 손님은 내 주문만 · 직원은 전체</text>
+
+  <rect x="360" y="468" width="188" height="66" rx="6" class="layer"/>
+  <text x="372" y="490" class="tb">④ ImageStorage</text>
+  <text x="372" y="510" class="s">사진 저장 · 주소 만들기</text>
+
+  <rect x="562" y="468" width="188" height="66" rx="6" class="layer"/>
+  <text x="574" y="490" class="tb">④ Repository (JPA)</text>
+  <text x="574" y="510" class="s">users · menus · orders</text>
+
+  <rect x="360" y="546" width="390" height="88" rx="6" class="layer"/>
+  <text x="375" y="568" class="tb">시작할 때</text>
+  <text x="375" y="588" class="s">MenuSeeder — 메뉴가 비어 있으면 기본 메뉴 5개</text>
+  <text x="375" y="606" class="s">StaffAccountInitializer — 직원 계정 1개 (없을 때만)</text>
+  <text x="375" y="624" class="code">/actuator/health · info · prometheus</text>
+
+  <!-- 계층 화살표 -->
+  <path d="M555 224 L555 234" class="line" marker-end="url(#arrow)"/>
+  <path d="M555 340 L555 350" class="line" marker-end="url(#arrow)"/>
+  <path d="M454 456 L454 466" class="line" marker-end="url(#arrow)"/>
+  <path d="M656 456 L656 466" class="line" marker-end="url(#arrow)"/>
+
+  <!-- 데이터 -->
+  <rect x="820" y="90" width="270" height="390" rx="10" class="data"/>
+  <text x="838" y="118" class="h">DB</text>
+  <text x="838" y="138" class="s">로컬: H2 메모리 · 운영: MySQL (미정)</text>
+
+  <rect x="836" y="152" width="238" height="80" rx="6" class="table"/>
+  <text x="850" y="174" class="tb">users</text>
+  <text x="850" y="193" class="code">username · password_hash</text>
+  <text x="850" y="211" class="code">role (CUSTOMER / STAFF)</text>
+
+  <rect x="836" y="244" width="238" height="80" rx="6" class="table"/>
+  <text x="850" y="266" class="tb">menus</text>
+  <text x="850" y="285" class="code">name · price · image_key</text>
+  <text x="850" y="303" class="code">available (false=판매 중지)</text>
+
+  <rect x="836" y="336" width="238" height="128" rx="6" class="table"/>
+  <text x="850" y="358" class="tb">orders</text>
+  <text x="850" y="377" class="code">customer_id · customer_name</text>
+  <text x="850" y="395" class="code">menu_id · menu_name</text>
+  <text x="850" y="413" class="code">unit_price · quantity</text>
+  <text x="850" y="431" class="code">status · created_at</text>
+  <text x="850" y="452" class="s">메뉴 이름 · 가격은 주문 당시 값 복사</text>
+
+  <rect x="820" y="500" width="270" height="110" rx="10" class="data"/>
+  <text x="838" y="528" class="h">사진 저장소</text>
+  <text x="838" y="550" class="code">menus/{메뉴id}/{uuid}.png</text>
+  <text x="838" y="572" class="s">로컬: ./data/menu-images 폴더</text>
+  <text x="838" y="592" class="s">운영: 외부 저장소 (연결 방식 미정)</text>
+
+  <!-- 앱 → 데이터 -->
+  <path d="M750 490 L790 490 L790 300 L818 300" class="line" marker-end="url(#arrow)"/>
+  <path d="M454 534 L454 540 L800 540 L800 555 L818 555" class="line" marker-end="url(#arrow)"/>
+
+  <!-- 사진은 브라우저가 주소로 직접 받음 -->
+  <path d="M155 560 L155 690 L955 690 L955 612" class="line" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="380" y="682" class="lbl">사진은 메뉴 응답에 든 주소(imageUrl)로 브라우저가 받음</text>
+
+  <!-- 범례 -->
+  <rect x="30" y="706" width="1060" height="38" rx="6" class="note"/>
+  <text x="46" y="730" class="s">상태 흐름 : 접수(RECEIVED) → 제조 중(PREPARING) → 완료(COMPLETED) · 취소(CANCELED) 는 접수 · 제조 중에서만 — 손님은 접수일 때 내 주문만 취소</text>
+</svg>
