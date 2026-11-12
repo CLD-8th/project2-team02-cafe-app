@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  *   직원만      메뉴 추가 · 수정 · 판매 중지
  *   로그인 필요  그 밖의 /api/** (주문의 손님 · 직원 구분은 OrderService 에서)
  *
- * 세션을 만들지 않음(STATELESS) — Pod 가 여러 개이고 롤링 배포로 바뀌어도 토큰만 있으면 됨.
+ * 세션을 만들지 않음(STATELESS) — 앱이 여러 개 떠 있거나 새 버전으로 바뀌어도 토큰만 있으면 됨.
  * CSRF 는 끔 — 쿠키가 아니라 Authorization 헤더로 인증하므로 해당 없음.
  */
 @Configuration
@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico", "/error").permitAll()
-                        // local 프로파일의 디스크 사진 (prod 는 S3 프리사인 URL 이라 앱을 거치지 않음)
+                        // 디스크에 저장한 메뉴 사진
                         .requestMatchers(HttpMethod.GET, "/local-images/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/menus").permitAll()

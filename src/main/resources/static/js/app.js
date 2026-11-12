@@ -127,8 +127,6 @@ function render() {
     loadCustomerMenus();
     loadMyOrders();
     timers.push(setInterval(loadMyOrders, 5000));
-    // S3 사진 URL 은 10분 뒤 만료 → 5분마다 메뉴를 다시 받아 새 URL 로 교체
-    timers.push(setInterval(loadCustomerMenus, 5 * 60 * 1000));
   }
 }
 
