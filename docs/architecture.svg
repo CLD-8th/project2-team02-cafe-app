@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 800" width="1120" height="800" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b3621"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0b6bcb"/>
+    </marker>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#777"/>
+    </marker>
+    <style>
+      .title { font-size: 22px; font-weight: 700; fill: #2b1d10; }
+      .sub { font-size: 13px; fill: #6b5a48; }
+      .h { font-size: 15px; font-weight: 700; fill: #2b1d10; }
+      .t { font-size: 12.5px; fill: #333; }
+      .s { font-size: 11.5px; fill: #555; }
+      .code { font-size: 11.5px; fill: #3a2a18; font-family: Consolas, Menlo, monospace; }
+      .lbl { font-size: 11.5px; fill: #4b3621; }
+      .lbl-blue { font-size: 11.5px; fill: #0b6bcb; }
+      .lbl-gray { font-size: 11.5px; fill: #666; }
+      .box { fill: #fff; stroke: #4b3621; stroke-width: 1.5; }
+      .app { fill: #fbf6ef; stroke: #4b3621; stroke-width: 2; }
+      .layer { fill: #fff; stroke: #c8a165; stroke-width: 1.2; }
+      .infra { fill: #f3f6fa; stroke: #7a8aa0; stroke-width: 1.4; stroke-dasharray: 6 4; }
+      .ci { fill: #f4f9f2; stroke: #5b8a4a; stroke-width: 1.4; }
+      .line { stroke: #4b3621; stroke-width: 1.6; fill: none; }
+      .line-blue { stroke: #0b6bcb; stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+      .line-gray { stroke: #777; stroke-width: 1.4; fill: none; stroke-dasharray: 4 4; }
+    </style>
+  </defs>
+
+  <rect width="1120" height="800" fill="#ffffff"/>
+
+  <text x="30" y="34" class="title">cafe 앱 아키텍처</text>
+  <text x="30" y="54" class="sub">실선 = 앱이 하는 일 · 점선 상자 = 인프라 담당이 만들고 나중에 연결할 자리 (ALB · RDS · S3 · Secret · Prometheus)</text>
+
+  <!-- 브라우저 -->
+  <rect x="30" y="100" width="210" height="190" rx="8" class="box"/>
+  <text x="45" y="125" class="h">브라우저</text>
+  <text x="45" y="148" class="t">static/ 바닐라 JS</text>
+  <text x="45" y="172" class="s">• 로그인 · 회원가입</text>
+  <text x="45" y="191" class="s">• 손님: 메뉴 보기 · 주문 · 내 주문</text>
+  <text x="45" y="210" class="s">• 직원: 주문 처리 · 메뉴 관리</text>
+  <text x="45" y="229" class="s">  · 사진 올리기</text>
+  <text x="45" y="255" class="s">JWT 는 localStorage →</text>
+  <text x="45" y="272" class="code">Authorization: Bearer …</text>
+
+  <!-- ALB -->
+  <rect x="285" y="150" width="120" height="90" rx="8" class="infra"/>
+  <text x="300" y="178" class="h">ALB</text>
+  <text x="300" y="198" class="s">Ingress 가 생성</text>
+  <text x="300" y="216" class="s">헬스 체크</text>
+  <text x="300" y="232" class="code">/actuator/health</text>
+
+  <path d="M240 195 L283 195" class="line" marker-end="url(#arrow)"/>
+
+  <!-- 앱 Pod -->
+  <rect x="450" y="90" width="400" height="430" rx="10" class="app"/>
+  <text x="468" y="117" class="h">cafe Pod (Spring Boot 4.1 · Java 21)</text>
+  <text x="468" y="137" class="s">이미지 하나 · non-root · 포트 8080 · 환경마다 다른 값은 환경 변수</text>
+
+  <path d="M405 195 L448 195" class="line" marker-end="url(#arrow)"/>
+
+  <rect x="470" y="152" width="360" height="56" rx="6" class="layer"/>
+  <text x="485" y="174" class="t" font-weight="700">Spring Security (STATELESS)</text>
+  <text x="485" y="195" class="s">JWT(HS256) 검증 · 누구나 / 로그인 / 직원만 · 세션 없음</text>
+
+  <rect x="470" y="220" width="360" height="74" rx="6" class="layer"/>
+  <text x="485" y="242" class="t" font-weight="700">api — 컨트롤러</text>
+  <text x="485" y="262" class="code">/api/auth  signup · login · me</text>
+  <text x="485" y="280" class="code">/api/menus  /api/orders</text>
+
+  <rect x="470" y="306" width="360" height="74" rx="6" class="layer"/>
+  <text x="485" y="328" class="t" font-weight="700">service — 업무 규칙</text>
+  <text x="485" y="348" class="s">AuthService · MenuService · OrderService</text>
+  <text x="485" y="366" class="s">상태 전이 · 손님은 내 주문만 · 직원은 전체</text>
+
+  <rect x="470" y="392" width="172" height="62" rx="6" class="layer"/>
+  <text x="482" y="414" class="t" font-weight="700">Repository (JPA)</text>
+  <text x="482" y="434" class="s">users · menus · orders</text>
+
+  <rect x="658" y="392" width="172" height="62" rx="6" class="layer"/>
+  <text x="670" y="414" class="t" font-weight="700">ImageStorage</text>
+  <text x="670" y="434" class="s">local=디스크 · prod=S3</text>
+
+  <rect x="470" y="466" width="360" height="40" rx="6" class="layer"/>
+  <text x="485" y="491" class="code">/actuator/health · info · prometheus</text>
+
+  <!-- RDS -->
+  <rect x="900" y="330" width="190" height="110" rx="8" class="infra"/>
+  <text x="915" y="356" class="h">RDS MySQL</text>
+  <text x="915" y="378" class="s">격리 서브넷 · 암호화</text>
+  <text x="915" y="398" class="code">users / menus / orders</text>
+  <text x="915" y="420" class="s">local 은 H2 메모리</text>
+  <path d="M556 454 L556 460 L882 460 L882 400 L898 400" class="line" marker-end="url(#arrow)"/>
+  <text x="902" y="457" class="lbl">DB_URL · DB_USERNAME/PASSWORD</text>
+
+  <!-- S3 -->
+  <rect x="900" y="150" width="190" height="110" rx="8" class="infra"/>
+  <text x="915" y="176" class="h">S3 (비공개)</text>
+  <text x="915" y="198" class="code">menus/{id}/{uuid}.jpg</text>
+  <text x="915" y="220" class="s">Pod Identity 로 접근</text>
+  <text x="915" y="240" class="s">local 은 ./data/menu-images</text>
+  <path d="M830 410 L870 410 L870 230 L898 230" class="line" marker-end="url(#arrow)"/>
+  <text x="890" y="385" class="lbl" transform="rotate(-90 890 385)">PUT · 프리사인 서명</text>
+
+  <!-- 브라우저가 S3 에서 직접 사진 받기 -->
+  <path d="M135 100 L135 82 L995 82 L995 148" class="line-blue" marker-end="url(#arrow-blue)"/>
+  <text x="430" y="77" class="lbl-blue">사진은 브라우저가 S3 에서 직접 받음 — 메뉴 응답의 프리사인 GET URL (10분)</text>
+
+  <!-- Secret / ConfigMap -->
+  <rect x="900" y="470" width="190" height="96" rx="8" class="infra"/>
+  <text x="915" y="494" class="h">Secret · ConfigMap</text>
+  <text x="915" y="514" class="code">JWT_SECRET · DB_*</text>
+  <text x="915" y="532" class="code">STAFF_USERNAME/PASSWORD</text>
+  <text x="915" y="550" class="code">APP_S3_BUCKET</text>
+  <path d="M898 520 L852 520" class="line-gray" marker-end="url(#arrow-gray)"/>
+  <text x="860" y="585" class="lbl-gray">환경 변수로 주입 (값은 저장소에 없음)</text>
+
+  <!-- Prometheus -->
+  <rect x="285" y="440" width="140" height="70" rx="8" class="infra"/>
+  <text x="300" y="466" class="h">Prometheus</text>
+  <text x="300" y="486" class="s">ServiceMonitor</text>
+  <text x="300" y="502" class="s">골든 시그널</text>
+  <path d="M468 486 L427 486" class="line-gray" marker-end="url(#arrow-gray)"/>
+  <text x="430" y="530" class="lbl-gray">지표 pull</text>
+
+  <!-- CI/CD -->
+  <rect x="30" y="610" width="1060" height="160" rx="10" class="ci"/>
+  <text x="48" y="636" class="h">배포 흐름 (CI 는 매니페스트 커밋까지 · 배포는 Argo CD)</text>
+
+  <rect x="48" y="660" width="150" height="80" rx="6" class="box"/>
+  <text x="62" y="684" class="t" font-weight="700">app 저장소</text>
+  <text x="62" y="704" class="s">main 에 commit</text>
+  <text x="62" y="722" class="s">(PR 은 ci.yml 테스트)</text>
+
+  <rect x="232" y="660" width="170" height="80" rx="6" class="box"/>
+  <text x="246" y="684" class="t" font-weight="700">Actions test</text>
+  <text x="246" y="704" class="code">./gradlew test</text>
+  <text x="246" y="722" class="s">_test.yml 재사용</text>
+
+  <rect x="436" y="660" width="190" height="80" rx="6" class="box"/>
+  <text x="450" y="684" class="t" font-weight="700">build-push</text>
+  <text x="450" y="704" class="s">OIDC 역할 → ECR</text>
+  <text x="450" y="722" class="code">team02/cafe:&lt;sha7&gt;</text>
+
+  <rect x="660" y="660" width="200" height="80" rx="6" class="box"/>
+  <text x="674" y="684" class="t" font-weight="700">update-manifests</text>
+  <text x="674" y="704" class="s">쓰기 Deploy key</text>
+  <text x="674" y="722" class="code">newTag: "&lt;sha7&gt;" 커밋</text>
+
+  <rect x="894" y="660" width="180" height="80" rx="6" class="infra"/>
+  <text x="908" y="684" class="t" font-weight="700">Argo CD</text>
+  <text x="908" y="704" class="s">감지 → Sync</text>
+  <text x="908" y="722" class="s">Deployment 롤링</text>
+
+  <path d="M198 700 L230 700" class="line" marker-end="url(#arrow)"/>
+  <path d="M402 700 L434 700" class="line" marker-end="url(#arrow)"/>
+  <path d="M626 700 L658 700" class="line" marker-end="url(#arrow)"/>
+  <path d="M860 700 L892 700" class="line" marker-end="url(#arrow)"/>
+  <path d="M984 660 L984 600 L650 600 L650 522" class="line-gray" marker-end="url(#arrow-gray)"/>
+  <text x="700" y="595" class="lbl-gray">새 이미지로 Pod 교체</text>
+</svg>

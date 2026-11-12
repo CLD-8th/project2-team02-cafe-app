@@ -1,0 +1,30 @@
+# 컨테이너(EKS). 주문 · 회원 · 메뉴는 RDS MySQL, 메뉴 사진은 S3.
+# 접속 정보 · 비밀은 전부 환경 변수로만 받음 — 이미지 · 저장소에 넣지 않음. 필수 값이 비어 있으면 기동 실패.
+# 실제 값을 어디서 주입할지(ConfigMap · Secret · External Secrets)는 인프라 · 매니페스트 구성이 정해지면 연결.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      # 최초 기동 때 표를 만듦. 표가 생긴 뒤에는 DDL_AUTO=validate 로 바꿀 수 있음
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: false
+
+app:
+  jwt:
+    # 32바이트 이상. 모든 Pod 가 같은 값이어야 함 (비밀)
+    secret: ${JWT_SECRET}
+  staff:
+    # 선택. 둘 다 있을 때만 기동 시 직원 계정 생성 (이미 있으면 건너뜀)
+    username: ${STAFF_USERNAME:}
+    password: ${STAFF_PASSWORD:}
+  s3:
+    bucket: ${APP_S3_BUCKET}
+    region: ${AWS_REGION:ap-northeast-2}
+
+logging:
+  level:
+    com.example.cafe: info

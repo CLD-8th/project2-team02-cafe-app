@@ -1,0 +1,109 @@
+# CD — 이미지를 ECR 에 올리고, 매니페스트 저장소의 newTag 한 줄을 바꾸는 커밋으로 끝남.
+# 클러스터에는 손대지 않음 — 그 커밋을 Argo CD 가 감지해 동기화 · 롤링 배포함 (교안 GitOps · 태그 write-back).
+#
+#   main push → test → build-push (ECR · 태그 = 커밋 앞 7자리) → update-manifests (newTag 커밋)
+#
+# 인프라 · 매니페스트 저장소가 준비되기 전에는 vars 가 비어 있어 build-push · update-manifests 를 건너뜀.
+name: build-and-update
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 연달아 push 해도 매니페스트 커밋이 순서대로 쌓이게 · 진행 중인 실행은 취소하지 않음
+concurrency:
+  group: build-and-update
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+# 비밀이 아닌 설정값은 Actions 변수(vars) — Settings > Secrets and variables > Actions > Variables
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+
+jobs:
+  test:
+    uses: ./.github/workflows/_test.yml
+
+  build-push:
+    needs: test
+    if: ${{ vars.AWS_ROLE_ARN != '' && vars.ECR_REPOSITORY != '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    # OIDC 토큰을 받으려면 id-token: write 가 필요함 (이 잡에서만)
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image_tag: ${{ steps.image.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # GitHub OIDC 토큰 → AWS STS → team02- 역할의 임시 자격 증명. 저장소에 키 없음
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 태그 = 커밋 앞 7자리. ECR 이 Immutable 이라 같은 태그는 다시 못 올림 → 이미 있으면 건너뜀(다시 실행 대비)
+      - name: 이미지 빌드 · ECR push
+        id: image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          tag="${GITHUB_SHA::7}"
+          image="${REGISTRY}/${ECR_REPOSITORY}:${tag}"
+          if aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids imageTag="$tag" >/dev/null 2>&1; then
+            echo "이미 있음 — push 건너뜀 : $image"
+          else
+            docker build -t "$image" .
+            docker push "$image"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  update-manifests:
+    needs: build-push
+    if: ${{ vars.MANIFESTS_REPO != '' && vars.MANIFESTS_KUSTOMIZATION != '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # 매니페스트 저장소를 clone. 쓰기 허용 Deploy key — 새어도 그 저장소 하나에 그침
+      # (Argo CD 가 읽는 Deploy key 는 읽기 전용 · 이것과 별개의 키)
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.MANIFESTS_REPO }}
+          ssh-key: ${{ secrets.MANIFESTS_DEPLOY_KEY }}
+
+      # 사람이 손으로 하던 newTag 한 줄 교체. 숫자만 있는 태그도 문자열로 읽히게 따옴표
+      - name: newTag 변경
+        env:
+          TAG: ${{ needs.build-push.outputs.image_tag }}
+          FILE: ${{ vars.MANIFESTS_KUSTOMIZATION }}
+        run: |
+          sed -i -E "s|^([[:space:]]*newTag:).*|\1 \"${TAG}\"|" "$FILE"
+          git diff -- "$FILE"
+
+      # 이 커밋이 배포. 바뀐 게 없으면(다시 실행) 건너뜀 · 동시에 다른 커밋이 들어오면 rebase 후 다시 push
+      - name: 커밋 · push
+        env:
+          TAG: ${{ needs.build-push.outputs.image_tag }}
+          FILE: ${{ vars.MANIFESTS_KUSTOMIZATION }}
+        run: |
+          if git diff --quiet -- "$FILE"; then
+            echo "newTag 가 이미 ${TAG} — 커밋 건너뜀"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "cafe: ${TAG}" -m "app commit: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          for i in 1 2 3; do
+            git push && exit 0
+            git pull --rebase
+          done
+          exit 1

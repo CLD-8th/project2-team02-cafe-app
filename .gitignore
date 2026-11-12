@@ -1,21 +1,39 @@
-.gradle
-**/build/
+# 빌드 산출물
+.gradle/
+build/
 !**/src/**/build/
-
-# Ignore Gradle GUI config
+out/
 gradle-app.setting
-
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
-
-# Avoid ignore Gradle wrapper properties
-!gradle-wrapper.properties
-
-# Cache of project
 .gradletasknamecache
 
-# Eclipse Gradle plugin generated files
-# Eclipse Core
+# Gradle wrapper 는 올림
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
 .project
-# JDT-specific (Eclipse Java Development Tools)
 .classpath
+bin/
+
+# 실행 중 생기는 것
+data/
+logs/
+*.log
+
+# 비밀 값 (조직원 전원이 읽는 저장소 — 절대 올리지 않음)
+.env
+.env.*
+!.env.example
+env.sh
+
+# 키 · 자격 증명
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+.aws/
+credentials
