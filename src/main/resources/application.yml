@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cafe
+  profiles:
+    # 값을 지정하지 않으면 local 로 동작함.
+    # 컨테이너에서는 Dockerfile 이 SPRING_PROFILES_ACTIVE=prod 로 기동함.
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  jpa:
+    # 응답을 만드는 동안 DB 연결을 잡고 있지 않음 (경고 제거)
+    open-in-view: false
+  servlet:
+    multipart:
+      # 메뉴 사진 상한. 넘기면 컨트롤러에 닿기 전에 413 으로 거부됨 (업무 검사는 ImageValidator 2MB)
+      max-file-size: 2MB
+      max-request-size: 3MB
+
+app:
+  jwt:
+    # 토큰 유효 시간(초). 1시간 · 리프레시 토큰 없음 → 만료되면 다시 로그인
+    ttl-seconds: 3600
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # 헬스 체크(ALB · Probe) · 빌드 버전 · Prometheus 지표
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: never
+  info:
+    build:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        # p99 질의(histogram_quantile)용 http_server_requests_seconds_bucket 생성
+        http.server.requests: true
