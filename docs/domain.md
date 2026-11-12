@@ -2,7 +2,7 @@
 
 ## 01. 표
 
-엔티티 3개 = 표 3개. local 은 H2, prod 는 RDS MySQL 데이터베이스 `cafe`. `ddl-auto: update` 라 첫 기동 때 앱이 표를 만듦.
+엔티티 3개 = 표 3개. local 은 H2, prod 는 MySQL 데이터베이스 `cafe`. `ddl-auto: update` 라 첫 기동 때 앱이 표를 만듦.
 
 ```sql
 CREATE TABLE users (
@@ -52,8 +52,8 @@ CREATE TABLE orders (
 | 메뉴 | `menus` 가 비어 있으면 기동 시 | 아메리카노 4500 · 카페라테 5000 · 바닐라라테 5500 · 콜드브루 5000 · 녹차라테 5500 (가상) |
 | 직원 계정 | `STAFF_USERNAME` · `STAFF_PASSWORD` 가 있고 그 username 이 없으면 기동 시 | 역할 `STAFF` |
 
-- prod 는 RDS 에 저장되므로 Pod 가 재시작돼도 남음. 이미 있으면 건너뜀 → `STAFF_PASSWORD` 만 바꿔도 기존 비밀번호는 안 바뀜.
-- Pod 여러 개가 동시에 넣으려 하면 유일 제약으로 하나만 성공 · 나머지는 로그만 남기고 정상 기동.
+- prod 는 DB 에 저장되므로 앱이 재시작돼도 남음. 이미 있으면 건너뜀 → `STAFF_PASSWORD` 만 바꿔도 기존 비밀번호는 안 바뀜.
+- 앱 여러 개가 동시에 넣으려 하면 유일 제약으로 하나만 성공 · 나머지는 로그만 남기고 정상 기동.
 
 ## 03. 상태 전이
 
@@ -84,7 +84,7 @@ com.example.cafe
 ├── CafeApplication
 ├── api        컨트롤러 · dto · CurrentUsers(JWT → CurrentUser)
 ├── service    엔티티 · 리포지토리 · 업무 규칙 (Auth · Menu · Order · ImageValidator)
-├── storage    ImageStorage — LocalImageStorage(!prod) · S3ImageStorage(prod)
+├── storage    ImageStorage — local 은 디스크 · prod 는 외부 저장소
 ├── config     SecurityConfig · JwtConfig · MenuSeeder · StaffAccountInitializer
 └── common     ErrorResponse · GlobalExceptionHandler · 예외들
 ```

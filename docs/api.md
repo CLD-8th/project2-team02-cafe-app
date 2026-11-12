@@ -41,7 +41,7 @@
 ## 03. curl 예
 
 ```bash
-BASE=http://localhost:8080          # 클러스터에서는 ALB 주소
+BASE=http://localhost:8080
 
 # 가입 · 로그인 (가상 계정)
 curl -s -X POST $BASE/api/auth/signup -H 'Content-Type: application/json' -d '{"username":"guest01","password":"testpass1"}'
@@ -74,7 +74,7 @@ curl -s $BASE/actuator/prometheus | grep http_server_requests_seconds_count
 // POST /api/auth/login → 200
 { "accessToken": "eyJhbGciOiJIUzI1NiJ9…", "tokenType": "Bearer", "expiresIn": 3600, "username": "guest01", "role": "CUSTOMER" }
 
-// GET /api/menus → 200  (prod 의 imageUrl 은 S3 프리사인 URL)
+// GET /api/menus → 200  (local 기준 · 사진이 없으면 imageUrl 은 null)
 [
   { "id": 1, "name": "아메리카노", "price": 4500, "available": true, "imageUrl": "/local-images/menus/1/f77e3f06-….png" },
   { "id": 2, "name": "카페라테", "price": 5000, "available": true, "imageUrl": null }
