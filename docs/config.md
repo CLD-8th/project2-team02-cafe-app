@@ -7,7 +7,7 @@
 | 프로파일 | DB | 사진 | 언제 |
 | --- | --- | --- | --- |
 | `local` (기본) | H2 메모리 | 디스크 `./data/menu-images` | 내 PC · 테스트 · JDK 21 만 있으면 됨 |
-| `prod` | MySQL | 디스크 `/app/data/menu-images` | 운영 (Dockerfile 이 `SPRING_PROFILES_ACTIVE=prod` 로 띄움) |
+| `prod` | MySQL | S3 (`APP_S3_BUCKET`) | 운영 (Dockerfile 이 `SPRING_PROFILES_ACTIVE=prod` 로 띄움) |
 
 local 의 JWT 키 · 직원 계정(`staff` / `staff1234`)은 `application-local.yml` 의 **local 전용 테스트 값**. prod 에서는 쓰이지 않음.
 
@@ -22,7 +22,8 @@ local 의 JWT 키 · 직원 계정(`staff` / `staff1234`)은 `application-local.
 | `DB_PASSWORD` | ✅ | ✅ | DB 비밀번호 |
 | `JWT_SECRET` | ✅ | ✅ | 32바이트 이상 임의 문자열 · **앱이 여러 개면 모두 같은 값** (다르면 서로 토큰을 거부) |
 | `STAFF_USERNAME` · `STAFF_PASSWORD` | | ✅ | 둘 다 있으면 기동 시 직원 계정 생성 |
-| `APP_IMAGE_PATH` | | | 메뉴 사진 저장 폴더 (기본 `/app/data/menu-images`) |
+| `APP_S3_BUCKET` | ✅ | | 메뉴 사진 버킷 (비공개 · 자격 증명은 Pod Identity, 키 없음) |
+| `AWS_REGION` | | | 기본 `ap-northeast-2` |
 | `DDL_AUTO` | | | `update` (기본) / `validate` |
 | `SPRING_DATASOURCE_HIKARI_MAXIMUMPOOLSIZE` | | | 앱 하나당 DB 연결 수 (기본 10) |
 | `SPRING_DATASOURCE_HIKARI_CONNECTIONTIMEOUT` | | | DB 연결 대기 ms (기본 30000) |

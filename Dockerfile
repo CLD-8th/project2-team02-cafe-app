@@ -21,8 +21,7 @@ WORKDIR /app
 # root 로 띄우지 않음
 RUN groupadd --system app && useradd --system --gid app --no-create-home app
 COPY --from=build /workspace/app.jar app.jar
-RUN chown app:app app.jar \
- && mkdir -p /app/data/menu-images && chown -R app:app /app/data
+RUN chown app:app app.jar
 USER app
 
 EXPOSE 8080

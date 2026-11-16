@@ -1,4 +1,4 @@
-# 운영. 주문 · 회원 · 메뉴는 MySQL, 메뉴 사진은 디스크 폴더.
+# 운영. 주문 · 회원 · 메뉴는 MySQL, 메뉴 사진은 S3 (앱이 읽어서 /images/** 로 내려줌).
 # 접속 정보 · 비밀은 전부 환경 변수로만 받음 — 이미지 · 저장소에 넣지 않음. 필수 값이 비어 있으면 기동 실패.
 # 값을 어디서 넣을지는 운영 환경(인프라) 구성이 정해지면 연결.
 spring:
@@ -21,9 +21,10 @@ app:
     # 선택. 둘 다 있을 때만 기동 시 직원 계정 생성 (이미 있으면 건너뜀)
     username: ${STAFF_USERNAME:}
     password: ${STAFF_PASSWORD:}
-  storage:
-    # 메뉴 사진 저장 폴더 (기본 /app/data/menu-images)
-    local-path: ${APP_IMAGE_PATH:/app/data/menu-images}
+  s3:
+    # 메뉴 사진 버킷 (비공개). 자격 증명은 Pod Identity — 키를 넣지 않음
+    bucket: ${APP_S3_BUCKET}
+    region: ${AWS_REGION:ap-northeast-2}
 
 logging:
   level:

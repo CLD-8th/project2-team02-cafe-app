@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -103,11 +105,19 @@ class MenuApiTest extends ApiTestSupport {
                         .with(r -> { r.setMethod("PUT"); return r; })
                         .header("Authorization", bearer(staff)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.imageUrl").value(startsWith("/local-images/menus/" + id + "/")))
+                .andExpect(jsonPath("$.imageUrl").value(startsWith("/images/menus/" + id + "/")))
                 .andReturn().getResponse().getContentAsString();
 
-        // 로컬 사진은 로그인 없이 받을 수 있음
-        mvc.perform(get(field(res, "imageUrl"))).andExpect(status().isOk());
+        // 사진은 로그인 없이 받을 수 있고, 주소가 바뀌지 않는 한 내용도 같아서 오래 캐시함
+        mvc.perform(get(field(res, "imageUrl")))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "image/png"))
+                .andExpect(header().string("Cache-Control", containsString("max-age=31536000")));
+
+        // 앱이 만든 key 모양이 아니거나 없는 사진은 404
+        mvc.perform(get("/images/menus/" + id + "/evil.png")).andExpect(status().isNotFound());
+        mvc.perform(get("/images/menus/" + id + "/00000000-0000-0000-0000-000000000000.png"))
+                .andExpect(status().isNotFound());
 
         MockMultipartFile exe = new MockMultipartFile("file", "a.exe", "application/octet-stream", new byte[]{1});
         mvc.perform(multipart("/api/menus/" + id + "/image").file(exe)
