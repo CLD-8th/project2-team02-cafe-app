@@ -18,11 +18,15 @@ RUN ./gradlew --no-daemon clean bootJar -x test \
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# root 로 띄우지 않음
-RUN groupadd --system app && useradd --system --gid app --no-create-home app
+# root 로 띄우지 않음 — UID · GID 1000 고정 (매니페스트 runAsUser · runAsGroup 1000 과 맞춤)
+# 베이스(Ubuntu)에 이미 있는 ubuntu 사용자(UID 1000)를 지우고 app 으로 다시 만듦
+RUN userdel --remove ubuntu 2>/dev/null || true \
+ && groupadd --gid 1000 app \
+ && useradd --uid 1000 --gid app --no-create-home --shell /usr/sbin/nologin app
 COPY --from=build /workspace/app.jar app.jar
 RUN chown app:app app.jar
-USER app
+# 숫자로 지정해야 쿠버네티스 runAsNonRoot 가 root 가 아님을 확인할 수 있음
+USER 1000:1000
 
 EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=prod
