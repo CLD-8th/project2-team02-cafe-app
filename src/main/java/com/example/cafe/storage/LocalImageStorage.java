@@ -1,28 +1,33 @@
 package com.example.cafe.storage;
 
+import com.example.cafe.common.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 /**
- * 디스크 저장소. 저장 폴더는 app.storage.local-path (local 은 ./data/menu-images).
- * 저장한 사진은 /local-images/** 로 앱이 직접 내려줌.
+ * 디스크 저장소. prod 가 아닐 때(내 PC · 테스트). 저장 폴더는 app.storage.local-path (기본 ./data/menu-images).
  */
-@Configuration
-public class LocalImageStorage implements ImageStorage, WebMvcConfigurer {
-
-    public static final String URL_PREFIX = "/local-images/";
+@Component
+@Profile("!prod")
+public class LocalImageStorage implements ImageStorage {
 
     private static final Logger log = LoggerFactory.getLogger(LocalImageStorage.class);
+
+    /** 저장할 때 확장자는 Content-Type 에서 정했으므로(ImageValidator) 읽을 때는 확장자로 되돌림 */
+    private static final Map<String, String> CONTENT_TYPES = Map.of(
+            "jpg", "image/jpeg",
+            "png", "image/png",
+            "webp", "image/webp");
 
     private final Path root;
 
@@ -45,8 +50,14 @@ public class LocalImageStorage implements ImageStorage, WebMvcConfigurer {
     }
 
     @Override
-    public String url(String key) {
-        return URL_PREFIX + key;
+    public StoredImage load(String key) throws IOException {
+        Path file = resolve(key);
+        if (!Files.isRegularFile(file)) {
+            throw new NotFoundException("없는 사진: " + key);
+        }
+        String ext = key.substring(key.lastIndexOf('.') + 1);
+        String type = CONTENT_TYPES.getOrDefault(ext, "application/octet-stream");
+        return new StoredImage(Files.newInputStream(file), Files.size(file), type);
     }
 
     @Override
@@ -61,10 +72,5 @@ public class LocalImageStorage implements ImageStorage, WebMvcConfigurer {
             throw new IllegalArgumentException("잘못된 경로");
         }
         return p;
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(URL_PREFIX + "**").addResourceLocations(root.toUri().toString());
     }
 }

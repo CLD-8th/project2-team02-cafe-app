@@ -16,6 +16,7 @@
 | PATCH | `/api/menus/{id}` | 직원 | 수정. `{name?, price?, available?}` — 넘긴 값만 | 200 |
 | DELETE | `/api/menus/{id}` | 직원 | 판매 중지 (행은 남음 · `available:true` 로 되살림) | 204 |
 | PUT | `/api/menus/{id}/image` | 직원 | 사진 올리기 · 교체. multipart 항목 `file` · jpg/png/webp · 2MB | 200 |
+| GET | `/images/menus/{id}/{uuid}.{ext}` | 누구나 | 사진 내려받기 (메뉴 응답의 `imageUrl`). 저장소에서 앱이 읽어 보냄 · 1년 캐시 · 없으면 404 | 200 |
 | **POST** | **`/api/orders`** | 로그인 | **주문 생성.** `{menuId, quantity}` · `RECEIVED` 로 시작 | 201 + `Location` |
 | **GET** | **`/api/orders/{id}`** | 로그인 | **주문 조회.** 손님은 내 주문만 | 200 |
 | **PATCH** | **`/api/orders/{id}/status`** | 로그인 | **상태 변경.** `{status}` — 직원: 전이표대로 / 손님: `RECEIVED` 일 때 `CANCELED` 만 | 200 |
@@ -74,9 +75,9 @@ curl -s $BASE/actuator/prometheus | grep http_server_requests_seconds_count
 // POST /api/auth/login → 200
 { "accessToken": "eyJhbGciOiJIUzI1NiJ9…", "tokenType": "Bearer", "expiresIn": 3600, "username": "guest01", "role": "CUSTOMER" }
 
-// GET /api/menus → 200  (local 기준 · 사진이 없으면 imageUrl 은 null)
+// GET /api/menus → 200  (사진이 없으면 imageUrl 은 null)
 [
-  { "id": 1, "name": "아메리카노", "price": 4500, "available": true, "imageUrl": "/local-images/menus/1/f77e3f06-….png" },
+  { "id": 1, "name": "아메리카노", "price": 4500, "available": true, "imageUrl": "/images/menus/1/f77e3f06-….png" },
   { "id": 2, "name": "카페라테", "price": 5000, "available": true, "imageUrl": null }
 ]
 

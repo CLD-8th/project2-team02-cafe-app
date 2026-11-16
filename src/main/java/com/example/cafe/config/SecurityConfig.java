@@ -35,8 +35,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico", "/error").permitAll()
-                        // 디스크에 저장한 메뉴 사진
-                        .requestMatchers(HttpMethod.GET, "/local-images/**").permitAll()
+                        // 메뉴 사진 (저장소에서 읽어 앱이 내려줌)
+                        .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/menus").permitAll()
                         .requestMatchers("/api/menus", "/api/menus/**").hasRole("STAFF")

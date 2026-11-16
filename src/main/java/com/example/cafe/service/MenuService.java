@@ -102,8 +102,8 @@ public class MenuService {
         return item;
     }
 
-    /** 사진이 없으면 null */
+    /** 앱이 내려주는 사진 주소 (ImageController). 사진이 없으면 null */
     public String imageUrl(MenuItem item) {
-        return item.getImageKey() == null ? null : storage.url(item.getImageKey());
+        return item.getImageKey() == null ? null : ImageStorage.URL_PREFIX + item.getImageKey();
     }
 }

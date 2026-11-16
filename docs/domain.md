@@ -84,7 +84,7 @@ com.example.cafe
 ├── CafeApplication
 ├── api        컨트롤러 · dto · CurrentUsers(JWT → CurrentUser)
 ├── service    엔티티 · 리포지토리 · 업무 규칙 (Auth · Menu · Order · ImageValidator)
-├── storage    ImageStorage — 지금은 디스크 구현(LocalImageStorage) 하나
+├── storage    ImageStorage — 디스크(LocalImageStorage · local) · S3(S3ImageStorage · prod)
 ├── config     SecurityConfig · JwtConfig · MenuSeeder · StaffAccountInitializer
 └── common     ErrorResponse · GlobalExceptionHandler · 예외들
 ```

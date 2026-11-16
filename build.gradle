@@ -18,6 +18,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    awsSdkVersion = '2.31.59'
+}
+
 dependencies {
     // 웹 요청 처리 · 화면(static/)도 같은 앱이 내려줌
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
@@ -30,6 +34,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // 메뉴 사진. prod 는 S3 (local · 테스트는 디스크). 버전은 BOM 하나로 맞춤
+    implementation platform("software.amazon.awssdk:bom:${awsSdkVersion}")
+    implementation 'software.amazon.awssdk:s3'
 
     // 회원 · 로그인. 비밀번호는 BCrypt, 토큰은 JWT(HS256) — Spring Security 공식 모듈
     implementation 'org.springframework.boot:spring-boot-starter-security'
