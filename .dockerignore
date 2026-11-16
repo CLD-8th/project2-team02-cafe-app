@@ -1,0 +1,10 @@
+# 이미지 빌드에 보낼 파일만 고름 (허용 목록)
+# 처음에 전부 빼고, Dockerfile 이 COPY 하는 것만 다시 넣음
+# → .git · build · data · .env · 문서 · 로컬 설정이 이미지나 빌드 캐시에 섞이지 않음
+*
+
+!gradlew
+!settings.gradle
+!build.gradle
+!gradle/
+!src/main/
